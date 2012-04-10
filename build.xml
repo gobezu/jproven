@@ -1,0 +1,317 @@
+<?xml version="1.0" ?>
+<!--
+ * @version		$Id$
+ * @package		jbetolo
+ * @copyright		Copyright © 2010 - All rights reserved.
+ * @license		GNU/GPL
+ * @author		Gobezu Sewu
+ * @author mail		info@jproven.com
+ * @website		http://jproven.com
+
+Ant based build file
+@@todo:
+1. convert to a generic builder
+2. improved version numbering
+Note:
+1. currently building 1.5 joomla! setups as plugins expect not a subfolder for each plugin but this is taken care of in install.php
+-->
+<project name="jproven_build" basedir="." default="generic">
+        <import file="./build_js.ant" />
+        
+        <target name="generic" depends="getinput">
+                <property name="builddir" location="I:/builds/${projectname}/${revision.max}" />
+                <property name="buildfile" location="${builddir}/../${projectname}-${version}-rev${revision.max}" />
+
+                <tstamp>
+                        <format property="_YEAR" pattern="yyyy" locale="en,UK" />
+                        <format property="_TIME" pattern="yyyy MMMM dd HH:mm:ss Z" locale="en,UK" />
+                        <format property="_TIME_SHORT" pattern="MMMM yyyy" locale="en,UK" />
+                </tstamp>
+
+                <delete dir="${builddir}" />
+                <delete file="${buildfile}" />
+
+                <mkdir dir="${builddir}" />
+                
+                <!-- backend component -->
+                <if>
+                        <available file="administrator/components/com_${projectname}" type="dir" />
+                        <then>
+                                <property name="iscomponent" value="1" />
+<!--                                <copy todir="${builddir}" >
+                                        <filelist
+                                                dir="administrator/components/com_${projectname}"
+                                                files="install.php,uninstall.php,${projectname}.xml" />
+                                </copy>-->
+                                <copy todir="${builddir}" >
+                                        <filelist
+                                                dir="administrator/components/com_${projectname}"
+                                                files="script.${projectname}.php,${projectname}.xml" />
+                                </copy>
+                                
+                                <copy todir="${builddir}/administrator/components/com_${projectname}" >
+                                        <fileset dir="administrator/components/com_${projectname}">
+                                                <exclude name="${projectname}.xml"/>
+                                                <exclude name="script.${projectname}.php"/>
+                                        </fileset>
+                                </copy>
+                                
+                                <if>
+                                        <available file="administrator/language/en-GB/en-GB.com_${projectname}.ini" type="file" />
+                                        <then>
+                                                <copy todir="${builddir}/administrator/language/en-GB/" flatten="true">
+                                                        <fileset dir="administrator/language/">
+                                                                <include name="*/*.com_${projectname}*.ini"/>
+                                                        </fileset>
+                                                </copy>
+                                        </then>
+                                </if>
+                        </then>
+                        <else>
+                                <property name="iscomponent" value="0" />
+                        </else>
+                </if>
+                
+                <if>
+                        <available file="components/com_${projectname}" type="dir" />
+                        <then>
+                                <copy todir="${builddir}/components/com_${projectname}">
+                                        <fileset dir="components/com_${projectname}" />
+                                </copy>
+                                <if>
+                                        <available file="language/en-GB/en-GB.com_${projectname}.ini" type="file" />
+                                        <then>
+                                                <copy todir="${builddir}/language/en-GB" flatten="true">
+                                                        <fileset dir="language/">
+                                                                <include name="*/*.com_${projectname}*.ini"/>
+                                                        </fileset>
+                                                </copy>
+                                        </then>
+                                </if>
+                        </then>
+                </if>
+
+                <if>
+                        <available file="media/${projectname}" type="dir" />
+                        <then>
+                                <copy todir="${builddir}/media">
+                                        <fileset dir="media/${projectname}" />
+                                </copy>
+                        </then>
+                </if>
+                
+                <foreach list="content,system,user,editors-xtd,k2" param="plugintype" target="buildplugin">
+                        <param name="pluginname" value="${projectname}" />
+                        <param name="builddir" value="${builddir}" />
+                        <param name="iscomponent" value="${iscomponent}" />
+                </foreach>
+                
+                <antcall target="buildmodule">
+                        <param name="modulename" value="${projectname}" />
+                        <param name="iscomponent" value="${iscomponent}" />
+                </antcall>
+                
+                <!-- K2/k2fields sepcific -->
+                <if>
+                        <equals arg1="${projectname}" arg2="k2fields" />
+                        <then>
+                                <antcall target="buildmodule">
+                                        <param name="modulename" value="k2fields_contents" />
+                                </antcall>
+                                <antcall target="buildmodule">
+                                        <param name="modulename" value="k2fields_usertools" />
+                                </antcall>
+                                <!--<antcall target="buildplugin">
+                                        <param name="plugintype" value="k2" />
+                                        <param name="pluginname" value="slicomments" />
+                                </antcall>
+                                <antcall target="buildplugin">
+                                        <param name="plugintype" value="slicomments" />
+                                        <param name="pluginname" value="rate" />
+                                </antcall>-->
+                                <antcall target="buildplugin">
+                                        <param name="plugintype" value="jcomments" />
+                                        <param name="pluginname" value="rate" />
+                                </antcall>
+                                <antcall target="buildplugin">
+                                        <param name="plugintype" value="system" />
+                                        <param name="pluginname" value="widgetkit_k2" />
+                                </antcall>                             
+                        </then>
+                </if>
+
+                <echo>Replacing build variables...</echo>
+                <replace dir="${builddir}" token="//$Copyright$" value="${copyright}" />
+                <replace dir="${builddir}" token=";$Copyrightini$" value="${copyrightini}" />
+                <replace dir="${builddir}" token="$Id$" value="${version}-${revision.max} - ${_TIME}" />
+                <replace dir="${builddir}" token="$Owner$" value="${owner}" />
+                <replace dir="${builddir}" token="$Author$" value="${author}" />
+                <replace dir="${builddir}" token="$Email$" value="${email}" />
+                <replace dir="${builddir}" token="$Url$" value="${url}" />
+                <replace dir="${builddir}" token="$Ver$" value="${version}-rev${revision.max}" />
+                <replace dir="${builddir}" token="$Date$" value="${_TIME_SHORT}" />
+                <replace dir="${builddir}" token="$Year$" value="${_YEAR}" />
+                <replace dir="${builddir}" token="$Pkg$" value="${projectname}" />
+                <replace dir="${builddir}" token="$Package$" value="${package}" />
+                <replace dir="${builddir}" token="$Copyrightsee$" value="${copyrightsee}" />
+                <echo>Replacing done.</echo>
+                
+                <if>
+                        <equals arg1="${projectname}" arg2="k2fields" />
+			<then>
+                                <antcall target="js" />
+			</then>
+		</if>
+                
+                <tar destfile="${buildfile}.tar" basedir="${builddir}"/>
+                <gzip destfile="${buildfile}.tar.gz" src="${buildfile}.tar"/>
+                <delete dir="${builddir}" includeemptydirs="true" />
+                <delete file="${buildfile}.tar" />
+        </target>
+
+        <target name="getinput">
+                <input message="Project:" addproperty="projectname" defaultvalue="k2fields" validargs="k2fields,jbetolo,jkefel,jkefelfree,jdbg" />
+                <input message="Version:" addproperty="ver" />
+                <input message="Sub-version:" addproperty="subver" />
+                <if>
+                        <not>
+                                <equals arg1="${subver}" arg2="" />
+                        </not>
+                        <then>
+                                <property name="version" value="${ver}.${subver}" />
+                        </then>                        
+                        <else>
+                                <property name="version" value="${ver}" />
+                        </else>
+                </if>
+                <input message="JS compress?" addproperty="jscompress.do" validargs="y,n" defaultvalue="y" />
+                <property name="svndir" location="I:/svn/${projectname}" />
+                <property name="user.copyright" value="jproven" />
+                <property file="I:/svn/jproven/trunk/copyrights/${user.copyright}.ini" />
+                <property file="I:/svn/jproven/trunk/copyrights/copyright.ini" />
+                <property name="package" value="${projectname}" />
+                <svn><wcversion path="${svndir}" /></svn>
+                <echo>Building project ${projectname} version ${version} revision ${revision.max}</echo>
+        </target>
+        
+        <target name="buildplugin">
+                <echo>Building plugin: ${plugintype}/${pluginname}</echo>
+                <if>
+                        <available file="plugins/${plugintype}/${pluginname}" type="dir" />
+                        <then>
+                                <if>
+                                        <equals arg1="${iscomponent}" arg2="1" />
+                                        <then>
+                                                <property name="plgdir" value="${builddir}/plugins/${plugintype}/${pluginname}" />
+                                        </then>
+                                        <else>
+                                                <property name="plgdir" value="${builddir}" />
+                                        </else>
+                                </if>
+                                
+                                <copy todir="${plgdir}">
+                                        <fileset dir="plugins/${plugintype}/${pluginname}" />
+                                </copy>
+                                
+                                <if>
+                                        <available file="media/plg_${plugintype}_${pluginname}" type="dir" />
+                                        <then>
+                                                <copy todir="${plgdir}/media">
+                                                        <fileset dir="media/plg_${plugintype}_${pluginname}" />
+                                                </copy>
+                                        </then>
+                                </if>
+                                <if>
+                                        <available file="administrator/language/en-GB/en-GB.plg_${plugintype}_${pluginname}.ini" type="file" />
+                                        <then>
+                                                <copy todir="${plgdir}/language" flatten="true">
+                                                        <fileset dir="administrator/language/">
+                                                                <include name="*/*.plg_${plugintype}_${pluginname}.ini"/>
+                                                        </fileset>
+                                                </copy>
+                                        </then>
+                                </if>
+                                <if>
+                                        <equals arg1="${plugintype}${pluginname}" arg2="jcommentsrate" />
+                                        <then>
+                                                <antcall target="buildpluginratefix" />
+                                        </then>
+                                </if>
+                        </then>
+                </if>
+        </target>
+
+        <target name="buildmodule">
+                <echo>Building module: ${modulename}</echo>
+                <if>
+                        <available file="modules/mod_${modulename}" type="dir" />
+                        <then>
+                                <if>
+                                        <equals arg1="${iscomponent}" arg2="1" />
+                                        <then>
+                                                <property name="moddir" value="${builddir}/modules/mod_${modulename}" />
+                                        </then>
+                                        <else>
+                                                <property name="moddir" value="${builddir}" />
+                                        </else>
+                                </if>
+                                
+                                <copy todir="${moddir}">
+                                        <fileset dir="modules/mod_${modulename}" />
+                                </copy>
+                                
+                                <if>
+                                        <available file="media/mod_${modulename}" type="dir" />
+                                        <then>
+                                                <copy todir="${moddir}/media">
+                                                        <fileset dir="media/mod_${modulename}" />
+                                                </copy>
+                                        </then>
+                                </if>
+                                <if>
+                                        <available file="language/en-GB/en-GB.mod_${modulename}.ini" type="file" />
+                                        <then>
+                                                <copy todir="${moddir}/language" flatten="true">
+                                                        <fileset dir="language/">
+                                                                <include name="*/*.mod_${modulename}.ini"/>
+                                                        </fileset>
+                                                </copy>
+                                        </then>
+                                </if>
+                        </then>
+                </if>
+        </target>        
+        
+        <target name="buildpluginratefix">
+                <echo>Building plugin: system/ratefix</echo>
+                <if>
+                        <available file="plugins/system/ratefix" type="dir" />
+                        <then>
+                                <copy todir="${builddir}/plugins/jcomments/rate/setup/ratefix">
+                                        <fileset dir="plugins/system/ratefix" />
+                                </copy>
+                        </then>
+                </if>
+        </target>
+
+        <property name="tools.dir" value="I:/svn/jproven/trunk/tools" />
+
+        <property name="ant.contrib.jar.file" value="${tools.dir}/ant-contrib/ant-contrib-1.0b3.jar" />
+        <available file="${ant.contrib.jar.file}" property="ant.contrib.jar.file.available" />
+        <fail unless="ant.contrib.jar.file.available" message="Ant contrib library not installed" />
+        <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+                <classpath>
+                        <fileset dir="${tools.dir}/ant-contrib/" includes="*.jar" />
+                </classpath>
+        </taskdef>
+
+        <!-- <property name="svnant.jar.file" value="${tools.dir}/svnant/svnant.jar" /> -->
+        <property name="svnant.jar.file" value="${tools.dir}/svnant/svnant.jar" />
+        <available file="${svnant.jar.file}" property="svnant.jar.file.available" />
+        <fail unless="svnant.jar.file.available" message="svnAnt library not installed" />
+        <taskdef resource="org/tigris/subversion/svnant/svnantlib.xml">
+                <classpath>
+                        <fileset dir="${tools.dir}/svnant/" includes="*.jar" />
+                </classpath>
+        </taskdef>
+</project> 

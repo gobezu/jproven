@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="jproven_js_build" default="build_js">
+	<!--Build -->
+	<target name="js" description="lints and builds js project files for production use"
+		depends="load.properties">
+		<!-- <antcall target="js.lint"></antcall> -->
+		<antcall target="js.minify"></antcall>
+	</target>
+
+	<target name="load.properties" description="Set properties for this build">
+		<echo>load properties</echo>
+		<!--YUI Compressor location -->
+		<property name="yui.dir"
+			value="${tools.dir}/yuicompressor/build/yuicompressor-2.4.6.jar" />
+		<!--Source JS dir -->
+		<property name="src.js.dir" value="${builddir}/media/js" />
+		<!--Source CSS dir -->
+		<property name="src.css.dir" value="${builddir}/media/css" />
+		<!--Source Lint/Hint dir -->
+		<property name="jslint.js" value="${tools.dir}/lint/jshint.js" />
+		<!--Rhino dir -->
+		<property name="js.jar" value="${tools.dir}/lint/rhino/js.jar" />
+		<!-- Rhino lint -->
+		<property name="jshint-rhino.js" value="${tools.dir}/lint/jshint-rhino.js" />
+		<!--Output dir -->
+		<property name="build.dir" value="${builddir}/media/" />
+		<!--Build version information -->
+		<property name="build.major" value="1" />
+		<property name="build.minor" value="1" />
+		<property name="jshint.flags"
+			value="browser=true,mootools=true,white=true,loopfunc=true,expr=true,evil=true,boss=true,maxerr=25,undef=false,curly=true,debug=false,eqeqeq=true,immed=true,newcap=true" />
+		<property name="jshint.predef"
+			value="console,confirm" />
+		<property name="jshint.predef.test"
+			value="${jshint.predef},icon" />
+
+	</target>
+
+	<!--JS Lint -->
+	<target name="js.lint">
+		<antcall target="js.lint.do">
+			<param name="dir" value="${src.js.dir}" />
+		</antcall> 
+	</target>
+	
+	<target name="js.lint.do">
+		<echo>dir = ${dir}</echo>
+		<apply dir="${tools.dir}/lint" failonerror="true" executable="java" errorproperty="linterror" resultproperty="lintresult">
+			<fileset dir="${dir}">
+				<include name="**/*.js" />
+				<exclude name="**/lib/" />
+				<exclude name="**/*-min.js" />
+			</fileset>
+			<arg line="-jar ${js.jar} ${jshint-rhino.js}" />
+			<srcfile />
+			<arg value="${jshint.flags}" />
+			<arg value="${jshint.predef}" />
+		</apply>
+		<echo>lint error: ${linterror}</echo>
+		<echo>lint result: ${lintresult}</echo>
+		<!--  0 is no errors - > 0 is an erorr count -->
+		<echo>${dir} JSHint Passed</echo>
+	</target>
+	
+	<target name="js.minify">
+		<antcall target="js.minify.do">
+			<param name="dir" value="${src.js.dir}" />
+		</antcall> 
+	</target>
+	
+        <!--Minify JS files -->
+	<target name="js.minify.do" description="Minifies JavaScript files">
+		<echo>${dir}</echo>
+		<apply executable="java" parallel="false" dest="${dir}" failonerror="true" >
+                        <filelist dir="${dir}" files="jpform.js,jputility.js,jpsearch.js,jpprocessor.js,jpvalidator.js,k2fields_options.js,k2fields.js,k2fieldsbasic.js,k2fieldscomplex.js,k2fieldslist.js,k2fieldsmap.js,k2fieldsmedia.js,k2fieldsk2item.js,k2fieldsdatetime.js,k2fieldsmap_view.js" />
+			<arg line="-jar" />
+			<arg path="${yui.dir}" />
+			<srcfile />
+			<arg line="-o" />
+			<mapper type="glob" from="*.js" to="*-min.js" />
+			<targetfile />
+		</apply>
+                <concat destfile="${dir}/k2fields.rev${revision.max}.js" ignoreempty="true">
+			<filelist dir="${dir}" files="jpform-min.js,jputility-min.js,jpsearch-min.js,jpprocessor-min.js,jpvalidator-min.js,k2fields_options-min.js,k2fields-min.js,k2fieldsbasic-min.js,k2fieldscomplex-min.js,k2fieldslist-min.js,k2fieldsmap-min.js,k2fieldsmedia-min.js,k2fieldsk2item-min.js,k2fieldsdatetime-min.js,k2fieldsmap_view-min.js" />
+                </concat>
+                <delete dir="${dir}" includes="*-min.js" />
+		<echo>Finished js minifying</echo>
+	</target>
+</project>
