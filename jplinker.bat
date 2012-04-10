@@ -1,1 +1,1 @@
-@php I:\svn\jproven\trunk\jplinker.php %1 %2 %3 %4 %5
+@php I:\git\jproven\jplinker.php %1 %2 %3 %4 %5
