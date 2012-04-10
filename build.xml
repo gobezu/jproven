@@ -19,8 +19,8 @@ Note:
         <import file="./build_js.ant" />
         
         <target name="generic" depends="getinput">
-                <property name="builddir" location="I:/builds/${projectname}/${revision.max}" />
-                <property name="buildfile" location="${builddir}/../${projectname}-${version}-rev${revision.max}" />
+                <property name="build.dir" location="I:/builds/${projectname}/${version}" />
+                <property name="build.file" location="${build.dir}/../${projectname}-${version}" />
 
                 <tstamp>
                         <format property="_YEAR" pattern="yyyy" locale="en,UK" />
@@ -28,28 +28,28 @@ Note:
                         <format property="_TIME_SHORT" pattern="MMMM yyyy" locale="en,UK" />
                 </tstamp>
 
-                <delete dir="${builddir}" />
-                <delete file="${buildfile}" />
+                <delete dir="${build.dir}" />
+                <delete file="${build.file}" />
 
-                <mkdir dir="${builddir}" />
+                <mkdir dir="${build.dir}" />
                 
                 <!-- backend component -->
                 <if>
                         <available file="administrator/components/com_${projectname}" type="dir" />
                         <then>
                                 <property name="iscomponent" value="1" />
-<!--                                <copy todir="${builddir}" >
+<!--                                <copy todir="${build.dir}" >
                                         <filelist
                                                 dir="administrator/components/com_${projectname}"
                                                 files="install.php,uninstall.php,${projectname}.xml" />
                                 </copy>-->
-                                <copy todir="${builddir}" >
+                                <copy todir="${build.dir}" >
                                         <filelist
                                                 dir="administrator/components/com_${projectname}"
                                                 files="script.${projectname}.php,${projectname}.xml" />
                                 </copy>
                                 
-                                <copy todir="${builddir}/administrator/components/com_${projectname}" >
+                                <copy todir="${build.dir}/administrator/components/com_${projectname}" >
                                         <fileset dir="administrator/components/com_${projectname}">
                                                 <exclude name="${projectname}.xml"/>
                                                 <exclude name="script.${projectname}.php"/>
@@ -59,7 +59,7 @@ Note:
                                 <if>
                                         <available file="administrator/language/en-GB/en-GB.com_${projectname}.ini" type="file" />
                                         <then>
-                                                <copy todir="${builddir}/administrator/language/en-GB/" flatten="true">
+                                                <copy todir="${build.dir}/administrator/language/en-GB/" flatten="true">
                                                         <fileset dir="administrator/language/">
                                                                 <include name="*/*.com_${projectname}*.ini"/>
                                                         </fileset>
@@ -75,13 +75,13 @@ Note:
                 <if>
                         <available file="components/com_${projectname}" type="dir" />
                         <then>
-                                <copy todir="${builddir}/components/com_${projectname}">
+                                <copy todir="${build.dir}/components/com_${projectname}">
                                         <fileset dir="components/com_${projectname}" />
                                 </copy>
                                 <if>
                                         <available file="language/en-GB/en-GB.com_${projectname}.ini" type="file" />
                                         <then>
-                                                <copy todir="${builddir}/language/en-GB" flatten="true">
+                                                <copy todir="${build.dir}/language/en-GB" flatten="true">
                                                         <fileset dir="language/">
                                                                 <include name="*/*.com_${projectname}*.ini"/>
                                                         </fileset>
@@ -94,7 +94,7 @@ Note:
                 <if>
                         <available file="media/${projectname}" type="dir" />
                         <then>
-                                <copy todir="${builddir}/media">
+                                <copy todir="${build.dir}/media">
                                         <fileset dir="media/${projectname}" />
                                 </copy>
                         </then>
@@ -102,7 +102,7 @@ Note:
                 
                 <foreach list="content,system,user,editors-xtd,k2" param="plugintype" target="buildplugin">
                         <param name="pluginname" value="${projectname}" />
-                        <param name="builddir" value="${builddir}" />
+                        <param name="build.dir" value="${build.dir}" />
                         <param name="iscomponent" value="${iscomponent}" />
                 </foreach>
                 
@@ -141,19 +141,19 @@ Note:
                 </if>
 
                 <echo>Replacing build variables...</echo>
-                <replace dir="${builddir}" token="//$Copyright$" value="${copyright}" />
-                <replace dir="${builddir}" token=";$Copyrightini$" value="${copyrightini}" />
-                <replace dir="${builddir}" token="$Id$" value="${version}-${revision.max} - ${_TIME}" />
-                <replace dir="${builddir}" token="$Owner$" value="${owner}" />
-                <replace dir="${builddir}" token="$Author$" value="${author}" />
-                <replace dir="${builddir}" token="$Email$" value="${email}" />
-                <replace dir="${builddir}" token="$Url$" value="${url}" />
-                <replace dir="${builddir}" token="$Ver$" value="${version}-rev${revision.max}" />
-                <replace dir="${builddir}" token="$Date$" value="${_TIME_SHORT}" />
-                <replace dir="${builddir}" token="$Year$" value="${_YEAR}" />
-                <replace dir="${builddir}" token="$Pkg$" value="${projectname}" />
-                <replace dir="${builddir}" token="$Package$" value="${package}" />
-                <replace dir="${builddir}" token="$Copyrightsee$" value="${copyrightsee}" />
+                <replace dir="${build.dir}" token="//$Copyright$" value="${copyright}" />
+                <replace dir="${build.dir}" token=";$Copyrightini$" value="${copyrightini}" />
+                <replace dir="${build.dir}" token="$Id$" value="${version} - ${_TIME}" />
+                <replace dir="${build.dir}" token="$Owner$" value="${owner}" />
+                <replace dir="${build.dir}" token="$Author$" value="${author}" />
+                <replace dir="${build.dir}" token="$Email$" value="${email}" />
+                <replace dir="${build.dir}" token="$Url$" value="${url}" />
+                <replace dir="${build.dir}" token="$Ver$" value="${version}" />
+                <replace dir="${build.dir}" token="$Date$" value="${_TIME_SHORT}" />
+                <replace dir="${build.dir}" token="$Year$" value="${_YEAR}" />
+                <replace dir="${build.dir}" token="$Pkg$" value="${projectname}" />
+                <replace dir="${build.dir}" token="$Package$" value="${package}" />
+                <replace dir="${build.dir}" token="$Copyrightsee$" value="${copyrightsee}" />
                 <echo>Replacing done.</echo>
                 
                 <if>
@@ -163,35 +163,27 @@ Note:
 			</then>
 		</if>
                 
-                <tar destfile="${buildfile}.tar" basedir="${builddir}"/>
-                <gzip destfile="${buildfile}.tar.gz" src="${buildfile}.tar"/>
-                <delete dir="${builddir}" includeemptydirs="true" />
-                <delete file="${buildfile}.tar" />
+                <tar destfile="${build.file}.tar" basedir="${build.dir}"/>
+                <gzip destfile="${build.file}.tar.gz" src="${build.file}.tar"/>
+                <delete dir="${build.dir}" includeemptydirs="true" />
+                <delete file="${build.file}.tar" />
         </target>
 
         <target name="getinput">
                 <input message="Project:" addproperty="projectname" defaultvalue="k2fields" validargs="k2fields,jbetolo,jkefel,jkefelfree,jdbg" />
-                <input message="Version:" addproperty="ver" />
-                <input message="Sub-version:" addproperty="subver" />
-                <if>
-                        <not>
-                                <equals arg1="${subver}" arg2="" />
-                        </not>
-                        <then>
-                                <property name="version" value="${ver}.${subver}" />
-                        </then>                        
-                        <else>
-                                <property name="version" value="${ver}" />
-                        </else>
-                </if>
-                <input message="JS compress?" addproperty="jscompress.do" validargs="y,n" defaultvalue="y" />
-                <property name="svndir" location="I:/svn/${projectname}" />
+                <property name="git.bin" value="C:\Program Files (x86)\Git\bin\git.exe" />
+                
+                <exec executable="${git.bin}" outputproperty="version">
+                        <arg line="--git-dir" />
+                        <arg path="${gir.repo.root}${projectname}/.git" />
+                        <arg value="describe" />
+                </exec>
+                
                 <property name="user.copyright" value="jproven" />
-                <property file="I:/svn/jproven/trunk/copyrights/${user.copyright}.ini" />
-                <property file="I:/svn/jproven/trunk/copyrights/copyright.ini" />
+                <property file="${gir.repo.root}jproven/copyrights/copyright.ini" />
                 <property name="package" value="${projectname}" />
-                <svn><wcversion path="${svndir}" /></svn>
-                <echo>Building project ${projectname} version ${version} revision ${revision.max}</echo>
+                
+                <echo>Building project ${projectname} version ${version}</echo>
         </target>
         
         <target name="buildplugin">
@@ -202,10 +194,10 @@ Note:
                                 <if>
                                         <equals arg1="${iscomponent}" arg2="1" />
                                         <then>
-                                                <property name="plgdir" value="${builddir}/plugins/${plugintype}/${pluginname}" />
+                                                <property name="plgdir" value="${build.dir}/plugins/${plugintype}/${pluginname}" />
                                         </then>
                                         <else>
-                                                <property name="plgdir" value="${builddir}" />
+                                                <property name="plgdir" value="${build.dir}" />
                                         </else>
                                 </if>
                                 
@@ -249,10 +241,10 @@ Note:
                                 <if>
                                         <equals arg1="${iscomponent}" arg2="1" />
                                         <then>
-                                                <property name="moddir" value="${builddir}/modules/mod_${modulename}" />
+                                                <property name="moddir" value="${build.dir}/modules/mod_${modulename}" />
                                         </then>
                                         <else>
-                                                <property name="moddir" value="${builddir}" />
+                                                <property name="moddir" value="${build.dir}" />
                                         </else>
                                 </if>
                                 
@@ -287,14 +279,15 @@ Note:
                 <if>
                         <available file="plugins/system/ratefix" type="dir" />
                         <then>
-                                <copy todir="${builddir}/plugins/jcomments/rate/setup/ratefix">
+                                <copy todir="${build.dir}/plugins/jcomments/rate/setup/ratefix">
                                         <fileset dir="plugins/system/ratefix" />
                                 </copy>
                         </then>
                 </if>
         </target>
 
-        <property name="tools.dir" value="I:/svn/jproven/trunk/tools" />
+        <property name="gir.repo.root" value="I:/git/" />
+        <property name="tools.dir" value="${gir.repo.root}jproven/tools" />
 
         <property name="ant.contrib.jar.file" value="${tools.dir}/ant-contrib/ant-contrib-1.0b3.jar" />
         <available file="${ant.contrib.jar.file}" property="ant.contrib.jar.file.available" />
@@ -302,16 +295,6 @@ Note:
         <taskdef resource="net/sf/antcontrib/antcontrib.properties">
                 <classpath>
                         <fileset dir="${tools.dir}/ant-contrib/" includes="*.jar" />
-                </classpath>
-        </taskdef>
-
-        <!-- <property name="svnant.jar.file" value="${tools.dir}/svnant/svnant.jar" /> -->
-        <property name="svnant.jar.file" value="${tools.dir}/svnant/svnant.jar" />
-        <available file="${svnant.jar.file}" property="svnant.jar.file.available" />
-        <fail unless="svnant.jar.file.available" message="svnAnt library not installed" />
-        <taskdef resource="org/tigris/subversion/svnant/svnantlib.xml">
-                <classpath>
-                        <fileset dir="${tools.dir}/svnant/" includes="*.jar" />
                 </classpath>
         </taskdef>
 </project> 

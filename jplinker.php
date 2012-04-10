@@ -64,8 +64,8 @@ if (file_exists($source)) {
         }
 
         $adhocs = array(
-                array('src'=>'I:\\svn\\jproven\\trunk\\build.xml', 'tgt' => $target . 'build.ant'),
-                array('src'=>'I:\\svn\\jproven\\trunk\\build_js.xml', 'tgt' => $target . 'build_js.ant')
+                array('src'=>'I:\\git\\jproven\\build.xml', 'tgt' => $target . 'build.ant'),
+                array('src'=>'I:\\git\\jproven\\build_js.xml', 'tgt' => $target . 'build_js.ant')
         );
         
         foreach ($adhocs as $adhoc) {
