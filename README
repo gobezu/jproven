@@ -1,0 +1,14 @@
+Set of build tools including ant build file for most of my projects
+
+For use on windows platform use jplinker.bat
+
+The following is some notes and not a coherent set of usage instructions which I will put in place when time avails...
+
+Usage:
+
+1. to link an extension project (called jbetolo living inside the source dir) inside your website project (called wwwn living in the target dir) issue 
+- jplinker jbetolo wwwn git
+
+(NOTE: the last argument git indicates the source version control system employed for the extension project as I have my local forks of each system in separate folder)
+
+2. ant build file for the sake of use in netbeans exists and the linked file is renamed to .ant in order for netbeans to recognize it properly
