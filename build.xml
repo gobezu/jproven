@@ -180,6 +180,7 @@ Note:
                 </exec>
                 
                 <property name="user.copyright" value="jproven" />
+                <property file="I:/svn/jproven/trunk/copyrights/${user.copyright}.ini" />
                 <property file="${gir.repo.root}jproven/copyrights/copyright.ini" />
                 <property name="package" value="${projectname}" />
                 

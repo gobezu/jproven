@@ -13,9 +13,9 @@
 		<property name="yui.dir"
 			value="${tools.dir}/yuicompressor/build/yuicompressor-2.4.6.jar" />
 		<!--Source JS dir -->
-		<property name="src.js.dir" value="${builddir}/media/js" />
+		<property name="src.js.dir" value="${build.dir}/media/js" />
 		<!--Source CSS dir -->
-		<property name="src.css.dir" value="${builddir}/media/css" />
+		<property name="src.css.dir" value="${build.dir}/media/css" />
 		<!--Source Lint/Hint dir -->
 		<property name="jslint.js" value="${tools.dir}/lint/jshint.js" />
 		<!--Rhino dir -->
@@ -23,7 +23,7 @@
 		<!-- Rhino lint -->
 		<property name="jshint-rhino.js" value="${tools.dir}/lint/jshint-rhino.js" />
 		<!--Output dir -->
-		<property name="build.dir" value="${builddir}/media/" />
+		<property name="build.dir" value="${build.dir}/media/" />
 		<!--Build version information -->
 		<property name="build.major" value="1" />
 		<property name="build.minor" value="1" />
@@ -80,6 +80,7 @@
 			<mapper type="glob" from="*.js" to="*-min.js" />
 			<targetfile />
 		</apply>
+                <delete dir="${dir}" includes="k2fields.v*.js" />
                 <concat destfile="${dir}/k2fields.v${version}.js" ignoreempty="true">
 			<filelist dir="${dir}" files="jpform-min.js,jputility-min.js,jpsearch-min.js,jpprocessor-min.js,jpvalidator-min.js,k2fields_options-min.js,k2fields-min.js,k2fieldsbasic-min.js,k2fieldscomplex-min.js,k2fieldslist-min.js,k2fieldsmap-min.js,k2fieldsmedia-min.js,k2fieldsk2item-min.js,k2fieldsdatetime-min.js,k2fieldsmap_view-min.js" />
                 </concat>
