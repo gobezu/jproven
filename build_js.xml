@@ -81,7 +81,7 @@
 			<targetfile />
 		</apply>
                 <delete dir="${dir}" includes="k2fields.v*.js" />
-                <concat destfile="${dir}/k2fields.v${version}.js" ignoreempty="true">
+                <concat destfile="${dir}/k2fields.all.js" ignoreempty="true">
 			<filelist dir="${dir}" files="jpform-min.js,jputility-min.js,jpsearch-min.js,jpprocessor-min.js,jpvalidator-min.js,k2fields_options-min.js,k2fields-min.js,k2fieldsbasic-min.js,k2fieldscomplex-min.js,k2fieldslist-min.js,k2fieldsmap-min.js,k2fieldsmedia-min.js,k2fieldsk2item-min.js,k2fieldsdatetime-min.js,k2fieldsmap_view-min.js" />
                 </concat>
                 <delete dir="${dir}" includes="*-min.js" />

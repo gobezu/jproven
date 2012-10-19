@@ -143,6 +143,7 @@ Note:
                 <echo>Replacing build variables...</echo>
                 <replace dir="${build.dir}" token="//$Copyright$" value="${copyright}" />
                 <replace dir="${build.dir}" token=";$Copyrightini$" value="${copyrightini}" />
+                <replace dir="${build.dir}" token="$Copyrightcss$" value="${copyrightcss}" />
                 <replace dir="${build.dir}" token="$Id$" value="${version} - ${_TIME}" />
                 <replace dir="${build.dir}" token="$Owner$" value="${owner}" />
                 <replace dir="${build.dir}" token="$Author$" value="${author}" />
@@ -163,24 +164,29 @@ Note:
 			</then>
 		</if>
                 
-                <tar destfile="${build.file}.tar" basedir="${build.dir}"/>
-                <gzip destfile="${build.file}.tar.gz" src="${build.file}.tar"/>
+                <zip destfile="${build.file}.zip" basedir="${build.dir}"/>
+                <!--<tar destfile="${build.file}.tar" basedir="${build.dir}"/>
+                <gzip destfile="${build.file}.tar.gz" src="${build.file}.tar"/>-->
                 <delete dir="${build.dir}" includeemptydirs="true" />
-                <delete file="${build.file}.tar" />
+                <!--<delete file="${build.file}.tar" />-->
         </target>
 
         <target name="getinput">
                 <input message="Project:" addproperty="projectname" defaultvalue="k2fields" validargs="k2fields,jbetolo,jkefel,jkefelfree,jdbg" />
+                <input message="Version:" addproperty="version.in" />
                 <property name="git.bin" value="C:\Program Files (x86)\Git\bin\git.exe" />
                 
-                <exec executable="${git.bin}" outputproperty="version">
+                <exec executable="${git.bin}" outputproperty="version.git">
                         <arg line="--git-dir" />
                         <arg path="${gir.repo.root}${projectname}/.git" />
                         <arg value="describe" />
+                        <arg line="--always" />
                 </exec>
                 
+                <property name="version" value="${version.in}.${version.git}" />
+                
                 <property name="user.copyright" value="jproven" />
-                <property file="I:/svn/jproven/trunk/copyrights/${user.copyright}.ini" />
+                <property file="I:/git/jproven/copyrights/${user.copyright}.ini" />
                 <property file="${gir.repo.root}jproven/copyrights/copyright.ini" />
                 <property name="package" value="${projectname}" />
                 
