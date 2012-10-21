@@ -172,7 +172,7 @@ Note:
         </target>
 
         <target name="getinput">
-                <input message="Project:" addproperty="projectname" defaultvalue="k2fields" validargs="k2fields,jbetolo,jkefel,jkefelfree,jdbg" />
+                <input message="Project:" addproperty="projectname" defaultvalue="k2fields" validargs="k2fields,jbetolo,widgetkit_k2,widgetkit_virtuemart,jkefel,jkefelfree,jdbg" />
                 <input message="Version:" addproperty="version.in" />
                 <property name="git.bin" value="C:\Program Files (x86)\Git\bin\git.exe" />
                 
