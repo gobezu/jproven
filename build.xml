@@ -128,7 +128,8 @@ Note:
                                 <antcall target="buildplugin">
                                         <param name="plugintype" value="slicomments" />
                                         <param name="pluginname" value="rate" />
-                                </antcall>-->
+                                </antcall>
+                                -->
                                 <antcall target="buildplugin">
                                         <param name="plugintype" value="jcomments" />
                                         <param name="pluginname" value="rate" />

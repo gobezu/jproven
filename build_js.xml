@@ -72,7 +72,7 @@
 	<target name="js.minify.do" description="Minifies JavaScript files">
 		<echo>${dir}</echo>
 		<apply executable="java" parallel="false" dest="${dir}" failonerror="true" >
-                        <filelist dir="${dir}" files="jpform.js,jputility.js,jpsearch.js,jpprocessor.js,jpvalidator.js,k2fields_options.js,k2fields.js,k2fieldsbasic.js,k2fieldscomplex.js,k2fieldslist.js,k2fieldsmap.js,k2fieldsmedia.js,k2fieldsk2item.js,k2fieldsdatetime.js,k2fieldsmap_view.js" />
+                        <filelist dir="${dir}" files="jpform.js,jputility.js,jpsearch.js,jpcompare.js,jpprocessor.js,jpvalidator.js,k2fields_options.js,k2fields.js,k2fieldsbasic.js,k2fieldscomplex.js,k2fieldslist.js,k2fieldsmap.js,k2fieldsmedia.js,k2fieldsk2item.js,k2fieldsdatetime.js,k2fieldsmap_view.js" />
 			<arg line="-jar" />
 			<arg path="${yui.dir}" />
 			<srcfile />
