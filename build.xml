@@ -145,6 +145,7 @@ Note:
                 <echo>Replacing build variables...</echo>
                 <replace dir="${build.dir}" token="//$Copyright$" value="${copyright}" />
                 <replace dir="${build.dir}" token=";$Copyrightini$" value="${copyrightini}" />
+                <replace dir="${build.dir}" token="#$Copyrighthash$" value="${copyrighthash}" />
                 <replace dir="${build.dir}" token="$Copyrightcss$" value="${copyrightcss}" />
                 <replace dir="${build.dir}" token="$Id$" value="${version} - ${_TIME}" />
                 <replace dir="${build.dir}" token="$Owner$" value="${owner}" />
