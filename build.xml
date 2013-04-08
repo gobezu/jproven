@@ -122,10 +122,13 @@ Note:
                                         <param name="modulename" value="k2fields_usertools" />
                                 </antcall>
                                 <antcall target="buildplugin">
+                                        <param name="plugintype" value="k2" />
+                                        <param name="pluginname" value="k2komento" />
+                                </antcall>
+                                <!--<antcall target="buildplugin">
                                         <param name="plugintype" value="jcomments" />
                                         <param name="pluginname" value="rate" />
                                 </antcall>
-                                <!--
                                 <antcall target="buildplugin">
                                         <param name="plugintype" value="k2" />
                                         <param name="pluginname" value="slicomments" />
@@ -233,12 +236,14 @@ Note:
                                                 </copy>
                                         </then>
                                 </if>
-                                <if>
+<!--                               
+                                 <if>
                                         <equals arg1="${plugintype}${pluginname}" arg2="jcommentsrate" />
                                         <then>
                                                 <antcall target="buildpluginratefix" />
                                         </then>
                                 </if>
+-->                        
                         </then>
                 </if>
         </target>
